@@ -582,6 +582,11 @@
                         window.location.href = ea_settings['submit.redirect'];
                     }, 2000);
                 }
+                else {
+                    setTimeout(function () {
+                        window.location.href = window.location.protocol + "//" + window.location.host + window.location.pathname + window.location.search;
+                    }, 2000);
+                }
             }, 'json')
                 .fail(jQuery.proxy(function () {
                     this.$element.find('.ea-submit').prop('disabled', false);
