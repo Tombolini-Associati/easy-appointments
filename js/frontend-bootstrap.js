@@ -533,8 +533,12 @@
                 // TR > TD WITH TIME SLOTS
                 jQuery.each(response, function (index, element) {
                     var classAMPM = (ea_settings["time_format"] == "am-pm") ? ' am-pm' : '';
+                    var dToday = new Date();
+                    var dMonth = dToday.getMonth()+1;
+                    var dDay = dToday.getDate();
+                    var dTodayString = dToday.getFullYear() + '-' + ((''+dMonth).length<2 ? '0' : '') + dMonth + '-' + ((''+dDay).length<2 ? '0' : '') + dDay;
                     /// If todays date then do not return anything
-                    if(eDate < Date.parse(nextFreeSlot)) {
+                    if(eDate <= Date.parse(dTodayString)) {
                         isTodayOrPast = true;
                         return false;
                     } else if (freeSlot == true) { /// Check if free slot already booked
@@ -571,9 +575,10 @@
                     .addClass('time-row')
                     .append('<td colspan="' + colSpan +'" />');
 
-                newRow.find('td').append(next_element);
-
-                jQuery(calendar.dpDiv).find('.ui-datepicker-current-day').closest('tr').after(newRow);
+                if(!isTodayOrPast) {
+                    newRow.find('td').append(next_element);
+                    jQuery(calendar.dpDiv).find('.ui-datepicker-current-day').closest('tr').after(newRow);
+                }
 
                 // enabled
                 next_element.parent().removeClass('disabled');
