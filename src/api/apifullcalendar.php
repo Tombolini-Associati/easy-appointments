@@ -27,13 +27,20 @@ class EAApiFullCalendar
     protected $db_models;
 
     /**
+     * @var EAOptions
+     */
+    private $options;
+
+    /**
      * Category_List_Rest constructor.
      * @param $db_models
+     * @param $options
      */
-    public function __construct($db_models) {
+    public function __construct($db_models, $options) {
         $this->namespace = 'easy-appointments/v1';
         $this->rest_base = 'appointments';
         $this->db_models = $db_models;
+        $this->options = $options;
     }
 
     /**
@@ -47,7 +54,16 @@ class EAApiFullCalendar
                 'permission_callback' => array( $this, 'get_items_permissions_check' ),
                 'args'                => $this->arguments_definition(),
             )
-        ) );
+        ));
+
+        register_rest_route( $this->namespace, '/appointment/(?P<id>\d+)', array(
+            array(
+                'methods'             => WP_REST_Server::READABLE,
+                'callback'            => array( $this, 'get_item' ),
+                'permission_callback' => array( $this, 'get_items_permissions_check' ),
+                'args'                => $this->get_item_arguments_definition(),
+            )
+        ));
     }
     /**
      * Check permissions for the read.
@@ -119,6 +135,8 @@ class EAApiFullCalendar
                 'start'  => $element->date . 'T' . $element->start,
                 'end'    => $element->end_date . 'T' . $element->end,
                 'status' => $element->status,
+                'id'     => $element->id,
+                'hash'   => $this->calculate_hash($element->id),
             );
 
             $result['title'] = $element->{$title_key};
@@ -128,6 +146,10 @@ class EAApiFullCalendar
 
         // Return all of our comment response data.
         return rest_ensure_response( $res );
+    }
+
+    private function calculate_hash($id) {
+        return md5($id . wp_salt());
     }
 
     /**
@@ -227,9 +249,61 @@ class EAApiFullCalendar
         return $args;
     }
 
-    public function validate_date_string($string) {
+    /**
+     * @param WP_REST_Request $request get data from request.
+     */
+    public function get_item($request) {
+        header('Content-Type: text/plain');
 
+        $id   = $request->get_param('id');
+        $hash = $request->get_param('hash');
+        $app  = $this->db_models->get_appintment_by_id($id);
+
+        // Load options
+        $tplStr = $this->options->get_option_value('fullcalendar.event.template', '');
+
+        $data = [
+            'id'           => $id,
+            'hash'         => $hash,
+            'event'        => $app,
+            'user'         => wp_get_current_user(),
+            'is_admin'     => is_admin(),
+            'is_logged_in' => is_user_logged_in(),
+            'language'     => get_locale(),
+        ];
+
+        $template = new Leuffen\TextTemplate\TextTemplate($tplStr);
+//        $template->addFunction('demo', )
+        try {
+            echo $template->apply($data);
+        } catch (\Leuffen\TextTemplate\TemplateParsingException $e) {
+            echo '';
+        }
+
+        exit();
     }
 
+    /**
+     * @return array
+     */
+    public function get_item_arguments_definition() {
+        $args = array();
 
+        $args['id'] = array(
+            'description' => esc_html__( 'Appointments id', 'easy-appointments' ),
+            'type'        => 'integer',
+            'required'    => true,
+        );
+
+        $args['hash'] = array(
+            'description' => esc_html__( 'Appointments hash', 'easy-appointments' ),
+            'type'        => 'string',
+            'required'    => true,
+            'validate_callback' => function($param, $request, $key) {
+                return $param === $this->calculate_hash($request->get_param('id'));
+            },
+        );
+
+        return $args;
+    }
 }

@@ -88,7 +88,17 @@
                         days = '0' + days;
                     }
 
-                    return [true, date.getFullYear() + '-' + month + '-' + days, ''];
+                    var dateString = date.getFullYear() + '-' + month + '-' + days;
+                    var selecteble = true;
+                    var tooltip = '';
+
+                    if (Array.isArray(ea_settings.block_days) && ea_settings.block_days.includes(dateString)) {
+                        selecteble = false;
+                        dateString = 'blocked';
+                        tooltip = ea_settings.block_days_tooltip;
+                    }
+
+                    return [selecteble, dateString, tooltip];
                 }
             });
 
@@ -455,10 +465,12 @@
         getCurrentStatus: function () {
             var options = jQuery(this.element).find('select').not('.custom-field');
         },
-        blurNextSteps: function (current, dontScroll) {
+        blurNextSteps: function (current, dontScroll, initialCall) {
 
             // check if there is scroll param
             dontScroll = dontScroll || false;
+
+            initialCall = initialCall || false;
 
             current.removeClass('disabled');
 
@@ -478,7 +490,10 @@
 
                 var calendar = this.$element.find('.date');
 
-                this.selectChange();
+                // skip auto select date if
+                if (!initialCall || ea_settings.cal_auto_select !== '0') {
+                    this.selectChange();
+                }
 
                 if (!dontScroll) {
                     this.scrollToElement(calendar);
