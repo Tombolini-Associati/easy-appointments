@@ -553,10 +553,10 @@
                     var dDay = dToday.getDate();
                     var dTodayString = dToday.getFullYear() + '-' + ((''+dMonth).length<2 ? '0' : '') + dMonth + '-' + ((''+dDay).length<2 ? '0' : '') + dDay;
                     /// If todays date then do not return anything
-                    if(eDate <= Date.parse(dTodayString)) {
+                    /*if(eDate <= Date.parse(dTodayString)) {
                         isTodayOrPast = true;
                         return false;
-                    } else if (freeSlot == true) { /// Check if free slot already booked
+                    } else */if (freeSlot == true) { /// Check if free slot already booked
                         return false;
                     } else {
                         if (element.count > 0) {
