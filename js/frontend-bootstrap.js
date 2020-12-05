@@ -1,6 +1,7 @@
 ;(function ( $, window, document, undefined ) {
 
     var pluginName = "eaBootstrap",
+
     defaults = {
         main_selector: '#ea-bootstrap-main',
         main_template: null,
@@ -540,23 +541,25 @@
                     return a1 > b1 ? 1 : -1;
                 });
 
+
                 // TR > TD WITH TIME SLOTS
                 jQuery.each(response, function (index, element) {
                     var classAMPM = (ea_settings["time_format"] == "am-pm") ? ' am-pm' : '';
 
                     if (element.count > 0) {
-                            // show remaining slots or not
-                            if (ea_settings['show_remaining_slots'] === '1') {
-                                next_element.append('<a href="#" class="time-value slots' + classAMPM + '" data-val="' + element.value + '">' + element.show + ' (' + element.count + ')</a>');
-                            } else {
+                        // show remaining slots or not
+                        if (ea_settings['show_remaining_slots'] === '1') {
+                            next_element.append('<a href="#" class="time-value slots' + classAMPM + '" data-val="' + element.value + '">' + element.show + ' (' + element.count + ')</a>');
+                        } else {
                                 next_element.append('<a href="#" class="time-value' + classAMPM + '" data-val="' + element.value + '">' + element.show + '</a>');
-                            }
+                        }
                     } else {
-                            if (ea_settings['show_remaining_slots'] === '1') {
-                                next_element.append('<a class="time-disabled slots' + classAMPM + '">' + element.show + ' (0)</a>');
-                            } else {
-                                next_element.append('<a class="time-disabled' + classAMPM + '">' + element.show + '</a>');
-                            }
+
+                        if (ea_settings['show_remaining_slots'] === '1') {
+                            next_element.append('<a class="time-disabled slots' + classAMPM + '">' + element.show + ' (0)</a>');
+                        } else {
+                            next_element.append('<a class="time-disabled' + classAMPM + '">' + element.show + '</a>');
+                        }
                     }
                 });
 
