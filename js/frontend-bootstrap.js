@@ -1,7 +1,6 @@
 ;(function ( $, window, document, undefined ) {
 
     var pluginName = "eaBootstrap",
-    nextFreeSlot = "",
     defaults = {
         main_selector: '#ea-bootstrap-main',
         main_template: null,
@@ -507,7 +506,6 @@
             var plugin = this, next_element, calendarEl;
 
             calendarEl = jQuery(calendar.dpDiv).parents('.date');
-            eDate = Date.parse(dateString);
 
             if (plugin.settings.currentDate === dateString && calendarEl.find('.time-row').length > 0) {
                 calendarEl.find('.time-row').remove();
@@ -542,40 +540,23 @@
                     return a1 > b1 ? 1 : -1;
                 });
 
-                isPast = false; // flag for today or past date
-                let freeSlot = false; // is free slot flag
-
                 // TR > TD WITH TIME SLOTS
                 jQuery.each(response, function (index, element) {
                     var classAMPM = (ea_settings["time_format"] == "am-pm") ? ' am-pm' : '';
-                    var dToday = new Date();
-                    var dMonth = dToday.getMonth()+1;
-                    var dDay = dToday.getDate();
-                    var dTodayString = dToday.getFullYear() + '-' + ((''+dMonth).length<2 ? '0' : '') + dMonth + '-' + ((''+dDay).length<2 ? '0' : '') + dDay;
-                    /// If past date then do not return anything
-                    if(eDate < Date.parse(dTodayString)) {
-                        isPast = true;
-                        return false;
-                    } else if (freeSlot == true) { /// Check if free slot already booked
-                        return false;
-                    } else {
-                        if (element.count > 0) {
+
+                    if (element.count > 0) {
                             // show remaining slots or not
                             if (ea_settings['show_remaining_slots'] === '1') {
                                 next_element.append('<a href="#" class="time-value slots' + classAMPM + '" data-val="' + element.value + '">' + element.show + ' (' + element.count + ')</a>');
                             } else {
                                 next_element.append('<a href="#" class="time-value' + classAMPM + '" data-val="' + element.value + '">' + element.show + '</a>');
                             }
-                            freeSlot = true;
-                            return false; // allow only first slot
-                        } else {
-    
+                    } else {
                             if (ea_settings['show_remaining_slots'] === '1') {
                                 next_element.append('<a class="time-disabled slots' + classAMPM + '">' + element.show + ' (0)</a>');
                             } else {
                                 next_element.append('<a class="time-disabled' + classAMPM + '">' + element.show + '</a>');
                             }
-                        }
                     }
                 });
 
@@ -590,10 +571,9 @@
                     .addClass('time-row')
                     .append('<td colspan="' + colSpan +'" />');
 
-                if(!isPast) {
-                    newRow.find('td').append(next_element);
-                    jQuery(calendar.dpDiv).find('.ui-datepicker-current-day').closest('tr').after(newRow);
-                }
+                newRow.find('td').append(next_element);
+
+                jQuery(calendar.dpDiv).find('.ui-datepicker-current-day').closest('tr').after(newRow);
 
                 // enabled
                 next_element.parent().removeClass('disabled');
