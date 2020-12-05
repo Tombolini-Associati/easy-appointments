@@ -551,7 +551,7 @@
                         if (ea_settings['show_remaining_slots'] === '1') {
                             next_element.append('<a href="#" class="time-value slots' + classAMPM + '" data-val="' + element.value + '">' + element.show + ' (' + element.count + ')</a>');
                         } else {
-                                next_element.append('<a href="#" class="time-value' + classAMPM + '" data-val="' + element.value + '">' + element.show + '</a>');
+                            next_element.append('<a href="#" class="time-value' + classAMPM + '" data-val="' + element.value + '">' + element.show + '</a>');
                         }
                     } else {
 
