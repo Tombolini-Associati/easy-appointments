@@ -542,7 +542,7 @@
                     return a1 > b1 ? 1 : -1;
                 });
 
-                isTodayOrPast = false; // flag for today or past date
+                isPast = false; // flag for today or past date
                 let freeSlot = false; // is free slot flag
 
                 // TR > TD WITH TIME SLOTS
@@ -552,11 +552,11 @@
                     var dMonth = dToday.getMonth()+1;
                     var dDay = dToday.getDate();
                     var dTodayString = dToday.getFullYear() + '-' + ((''+dMonth).length<2 ? '0' : '') + dMonth + '-' + ((''+dDay).length<2 ? '0' : '') + dDay;
-                    /// If todays date then do not return anything
-                    /*if(eDate <= Date.parse(dTodayString)) {
-                        isTodayOrPast = true;
+                    /// If past date then do not return anything
+                    if(eDate < Date.parse(dTodayString)) {
+                        isPast = true;
                         return false;
-                    } else */if (freeSlot == true) { /// Check if free slot already booked
+                    } else if (freeSlot == true) { /// Check if free slot already booked
                         return false;
                     } else {
                         if (element.count > 0) {
@@ -590,7 +590,7 @@
                     .addClass('time-row')
                     .append('<td colspan="' + colSpan +'" />');
 
-                if(!isTodayOrPast) {
+                if(!isPast) {
                     newRow.find('td').append(next_element);
                     jQuery(calendar.dpDiv).find('.ui-datepicker-current-day').closest('tr').after(newRow);
                 }
