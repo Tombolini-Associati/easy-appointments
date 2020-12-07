@@ -23,6 +23,48 @@
     }
 
     jQuery.extend(Plugin.prototype, {
+        vacation: function(workerId, day) {
+            var response = [true, day, ''];
+
+            // block days from shortcode
+            if (Array.isArray(ea_settings.block_days) && ea_settings.block_days.includes(day)) {
+                return [
+                    false,
+                    'blocked',
+                    ea_settings.block_days_tooltip
+                ];
+            }
+
+            if (!Array.isArray(ea_vacations) || ea_vacations.length === 0) {
+                return response;
+            }
+
+            jQuery.each(ea_vacations, function(index, vacation) {
+                // Check events
+                // Case we have workers selected
+                if (vacation.workers.length > 0) {
+                    // extract worker ids
+                    var workerIds = jQuery.map(vacation.workers, function(worker) {
+                        return worker.id;
+                    });
+                    // selected worker is not in vacation list exit
+                    if (jQuery.inArray(workerId, workerIds) === -1) {
+                        return true;
+                    }
+
+                }
+
+                if (jQuery.inArray(day, vacation.days) === -1) {
+                    return true;
+                }
+
+                response = [false, 'blocked vacation', vacation.tooltip];
+
+                return false;
+            });
+
+            return response;
+        },
         /**
          * Plugin init
          */
@@ -89,16 +131,9 @@
                     }
 
                     var dateString = date.getFullYear() + '-' + month + '-' + days;
-                    var selecteble = true;
-                    var tooltip = '';
+                    var workerId = plugin.$element.find('[name="worker"]').val();
 
-                    if (Array.isArray(ea_settings.block_days) && ea_settings.block_days.includes(dateString)) {
-                        selecteble = false;
-                        dateString = 'blocked';
-                        tooltip = ea_settings.block_days_tooltip;
-                    }
-
-                    return [selecteble, dateString, tooltip];
+                    return plugin.vacation(workerId, dateString);
                 }
             });
 
@@ -132,7 +167,7 @@
                     booking_data.price = plugin.$element.find('[name="service"] > option:selected').data('price');
 
                     var format = ea_settings['date_format'] + ' ' + ea_settings['time_format'];
-                    booking_data.date_time = moment(booking_data.date + ' ' + booking_data.time, ea_settings['defult_detafime_format']).format(format);
+                    booking_data.date_time = moment(booking_data.date + 'T' + booking_data.time, ea_settings['defult_detafime_format']).format(format);
 
                     // set overview cancel_appointment
                     var overview_content = '';
@@ -357,7 +392,7 @@
             //only visible step
             var nextStep = step.nextAll('.step:visible:first');
 
-            next = jQuery(nextStep).find('select,input');
+            var next = jQuery(nextStep).find('select,input');
 
             if (next.length === 0) {
                 this.blurNextSteps(nextStep);
@@ -489,6 +524,9 @@
             if (current.hasClass('calendar')) {
 
                 var calendar = this.$element.find('.date');
+
+                // refresh calendar
+                calendar.datepicker("refresh");
 
                 // skip auto select date if
                 if (!initialCall || ea_settings.cal_auto_select !== '0') {

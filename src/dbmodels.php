@@ -247,7 +247,6 @@ class EADBModels
      */
     public function replace($table_name, $data, $json = false, $forceStrings = false)
     {
-
         // strip out fields that are not mapped inside table
         $this->table_columns->clear_data($table_name, $data);
 
@@ -349,6 +348,8 @@ class EADBModels
     public function get_next($options, $order = '')
     {
         $table_name = $this->wpdb->prefix . 'ea_connections';
+
+        $options['next'] = $this->table_columns->validate_next_step($options['next']);
 
         $vars = '';
         $values = array();
@@ -548,11 +549,12 @@ class EADBModels
         return $this->wpdb->get_results($query);
     }
 
-    public function clear_options()
+    public function clear_options($type = 'default')
     {
         $table = $this->wpdb->prefix . 'ea_options';
 
-        $this->wpdb->query("DELETE FROM $table");
+        $query = $this->wpdb->prepare("DELETE FROM $table WHERE `type` = %s", $type);
+        $this->wpdb->query($query);
     }
 
     /**
@@ -679,5 +681,14 @@ class EADBModels
         $fields = $wpdb->get_col('SELECT CONCAT(\'#\', `slug`, \'#\') FROM ' . $table_name);
 
         return $fields;
+    }
+
+    public function get_worker_id_by_email($email)
+    {
+        $table_name = $this->wpdb->prefix . 'ea_staff';
+
+        $query = $this->wpdb->prepare("SELECT id FROM {$table_name} WHERE email = %s", array($email));
+
+        return $this->wpdb->get_var($query);
     }
 }

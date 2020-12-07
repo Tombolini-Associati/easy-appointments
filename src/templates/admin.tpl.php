@@ -1004,6 +1004,7 @@
                             <label for="">Type</label>
                             <select>
                                 <option value="INPUT"><?php _e('Input', 'easy-appointments'); ?></option>
+                                <option value="MASKED"><?php _e('Masked Input', 'easy-appointments'); ?></option>
                                 <option value="SELECT"><?php _e('Select', 'easy-appointments'); ?></option>
                                 <option value="TEXTAREA"><?php _e('Textarea', 'easy-appointments'); ?></option>
                                 <option value="PHONE"><?php _e('Phone', 'easy-appointments'); ?></option>
@@ -1063,6 +1064,20 @@
                             <input class="field" data-key="css.off" name="css.off" type="checkbox"
                             <% if (_.findWhere(settings,
                             {ea_key:'css.off'}).ea_value == "1") { %>checked<% } %>>
+                        </div>
+                    </div>
+                    <div class="form-item">
+                        <div class="label-with-tooltip">
+                            <label for="form.label.above"><?php _e('Form label style', 'easy-appointments'); ?></label>
+                            <span class="tooltip tooltip-right"
+                                  data-tooltip="<?php _e('Show labels above or inline with fields option on [ea_bootstrap] shortcode.', 'easy-appointments'); ?>"></span>
+                        </div>
+                        <div>
+                            <img data-value="0" class="form-label-option" title="inline" src="<?php echo plugin_dir_url( __DIR__ ) . '../img/label-inline.png';?>"/>
+                            <img data-value="1" class="form-label-option" title="above" src="<?php echo plugin_dir_url( __DIR__ ) . '../img/label-above.png';?>"/>
+                            <input class="field" type="hidden" name="form.label.above"
+                                   data-key="form.label.above" value="<%- _.findWhere(settings,
+                            {ea_key:'form.label.above'}).ea_value %>" />
                         </div>
                     </div>
                     <div class="form-item">
@@ -1178,6 +1193,19 @@
                         <input class="field" data-key="gdpr.message" name="gdpr.message" type="text"
                                value="<%- _.findWhere(settings, {ea_key:'gdpr.message'}).ea_value %>">
                     </div>
+                    <div class="form-item">
+                        <div class="label-with-tooltip">
+                            <label for=""><?php _e('Clear customer data older then 6 months', 'easy-appointments'); ?></label>
+                            <span class="tooltip tooltip-right"
+                                  data-tooltip="<?php _e('This action will remove custom form field values older then 6 months. After that appointments older then 6 months will not hold any customer related data.', 'easy-appointments'); ?>"></span>
+                        </div>
+                        <div class="field-wrap button">
+                            <input class="field" type="checkbox" name="gdpr.auto_remove" style="margin-right: 10px;" data-key="gdpr.auto_remove"<%
+                            if (typeof _.findWhere(settings, {ea_key:'gdpr.auto_remove'}) !== 'undefined' &&
+                            _.findWhere(settings, {ea_key:'gdpr.auto_remove'}).ea_value == '1') { %>checked<%
+                            } %> /> <?php _e('Auto remove data via Cron that runs once a day','easy-appointments');?><button class="button button-primary btn-gdpr-delete-data button-field" style="margin-left: 10px"><?php _e('Remove data now', 'easy-appointments'); ?></button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -1246,12 +1274,15 @@
         <label>Label</label><input type="text" class="field-label" name="field-label"
                                      value="<%= _.escape(item.label) %>">
     </p>
+
+    <% if (item.type !== "PHONE" && item.type !== "SELECT" && item.type !== "MASKED") { %>
     <p>
         <label>Placeholder</label><input type="text" class="field-mixed" name="field-mixed"
                                            value="<%= _.escape(item.mixed) %>">
     </p>
+    <% } %>
 
-    <% if (item.type !== "PHONE" && item.type !== "SELECT") { %>
+    <% if (item.type !== "PHONE" && item.type !== "SELECT" && item.type !== "MASKED") { %>
     <p>
         <label>Default value</label><input type="text" class="field-default_value" name="field-default_value"
                                          value="<%- item.default_value %>">
@@ -1264,6 +1295,17 @@
         <label>Default value</label><select class="field-default_value" name="field-default_value"><?php require __DIR__ . '/phone.list.tpl.php';?></select>
     </p>
     <% } %>
+
+    <% if (item.type === "MASKED") { %>
+    <p>
+        <label>Mask</label><input type="text" class="field-default_value" name="field-default_value" value="<%- item.default_value %>">
+        <p><?php _e('Mask options', 'easy-appointments');?> : </p>
+        <code>9 : numeric</code> , <code>a : alphabetical</code> , <code>* : alphanumeric</code>
+        <p><?php _e('Example', 'easy-appointments');?> : </p>
+        <code>(99) 9999[9]-9999</code> , <code>999-999-9999</code> , <code>aa-9{1,4}</code>
+    </p>
+    <% } %>
+
     <% if (item.type === "SELECT") { %>
     <p>
         <label>Options :</label>

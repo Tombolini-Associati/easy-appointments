@@ -131,6 +131,10 @@ class EAFullCalendar
         wp_enqueue_style('ea-full-calendar-style');
         wp_enqueue_style('ea-full-calendar-custom-css');
 
+        $customCss = $this->options->get_option_value('custom.css', '');
+        // add custom CSS
+        wp_add_inline_style( 'ea-full-calendar-custom-css', $customCss );
+
         $id = uniqid();
 
         $show_week_numbers = $code_params['show_week'] === '1' ? 'true' : 'false';
@@ -159,7 +163,8 @@ class EAFullCalendar
         if (!empty($this->options->get_option_value('fullcalendar.event.show'))) {
             $event_click_link = <<<EOT
         element.addClass('thickbox');
-        element.attr('href', wpApiSettings.root + 'easy-appointments/v1/appointment/' + event.id + '?hash=' + event.hash + '&_wpnonce=' + wpApiSettings.nonce);
+        element.addClass('ea-full-calendar-dialog-event');
+        element.attr('href', wpApiSettings.root + 'easy-appointments/v1/appointment/' + event.id + '?hash=' + event.hash + '&_wpnonce=' + wpApiSettings.nonce + '&width=100%&height=100%');
         element.attr('title', '#' + event.id + ' - ' + event.title);
 EOT;
         }

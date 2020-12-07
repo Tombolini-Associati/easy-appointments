@@ -93,7 +93,9 @@ select.field {
 	display: none;
 }
 
-.ea-row:hover .btn-edit, .ea-row:hover .btn-del, .ea-row:hover .btn-clone {
+.ea-row:hover .btn-edit, .ea-row:hover .btn-del, .ea-row:hover .btn-clone,
+.ea-row:focus .btn-edit, .ea-row:focus .btn-del, .ea-row:focus .btn-clone,
+.ea-row:focus-within .btn-edit, .ea-row:focus-within .btn-del, .ea-row:focus-within .btn-clone {
 	display: inline-block;
 	cursor: pointer;
 }
@@ -120,6 +122,10 @@ select.field {
 
 .filter-select select {
 	width: 180px;
+}
+
+select.time-start option:disabled {
+	background-color: grey;
 }
 
 .table-row-td p {
@@ -425,4 +431,15 @@ textarea[data-key="custom.css"] {
 	text-align: right;
 	border-top: 1px solid #ddd;
 	padding-top: 8px;
+}
+
+.form-label-option {
+	height: 75px;
+	margin-right: 10px;
+	border: 4px solid #ccc;
+	cursor: pointer;
+}
+
+.form-label-option.selected {
+	border: 4px solid #0073aa;
 }
