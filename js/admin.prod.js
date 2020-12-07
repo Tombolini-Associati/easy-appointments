@@ -278,6 +278,7 @@
             jQuery(this.el).html( renderedContent );
 
             this.$el.addClass('ea-row');
+            this.$el.attr('tabindex', '0');
 
             return this;
         },
@@ -558,6 +559,7 @@
             jQuery(this.el).html( renderedContent );
 
             this.$el.addClass('ea-row');
+            this.$el.attr('tabindex', '0');
 
             return this;
         },
@@ -847,6 +849,7 @@
             jQuery(this.el).html( renderedContent );
 
             this.$el.addClass('ea-row');
+            this.$el.attr('tabindex', '0');
 
             return this;
         },
@@ -1893,7 +1896,9 @@
             "click .tab-selection a": "tabClicked",
             "click .btn-add-redirect": "addAdvanceRedirect",
             "click .remove-advance-redirect": "removeAdvanceRedirect",
-            "change #ea-select-status": "defaultStatusChange"
+            "change #ea-select-status": "defaultStatusChange",
+            "click .form-label-option": "changeFormLabelStyle",
+            "click .btn-gdpr-delete-data": "gdprDeleteData",
         },
 
         initialize: function () {
@@ -1958,6 +1963,8 @@
 
             // render status change
             this.defaultStatusChange();
+
+            this.changeFormLabelStyleInit();
 
             return this;
         },
@@ -2148,7 +2155,7 @@
             e.preventDefault();
             var $btn = jQuery(e.currentTarget);
             var $li = $btn.closest('li');
-            var name = $li.data('name');
+            var name = '' + $li.data('name');
             var element = this.fields.findWhere({label: name});
 
             if ($btn.find('i').hasClass('fa-chevron-down')) {
@@ -2205,7 +2212,7 @@
 
             var $btn = jQuery(e.currentTarget);
             var $li = $btn.closest('li');
-            var name = $li.data('name');
+            var name = '' + $li.data('name');
             var element = this.fields.findWhere({label:name});
 
             var options = [];
@@ -2249,7 +2256,7 @@
 
             var $btn = jQuery(e.currentTarget);
             var $li = $btn.closest('li');
-            var name = $li.data('name');
+            var name = '' + $li.data('name');
             var element = this.fields.findWhere({label:name});
 
             this.fields.remove(element);
@@ -2388,6 +2395,42 @@
             }
 
             jQuery('#ea-select-status-notification').hide();
+        },
+
+        changeFormLabelStyle: function (e) {
+            var selected = jQuery(e.currentTarget);
+            var value = selected.data('value');
+
+            this.$el.find('[name="form.label.above"]').val(value);
+
+            this.$el.find('.form-label-option').toggleClass('selected');
+
+        },
+
+        changeFormLabelStyleInit: function () {
+            var initValue = this.$el.find('[name="form.label.above"]').val();
+
+            if (initValue !== '1') {
+                this.$el.find('.form-label-option').first().addClass('selected');
+                return;
+            }
+
+            this.$el.find('.form-label-option').last().addClass('selected');
+        },
+
+        gdprDeleteData: function() {
+            if (!confirm("Are you sure?")) {
+                return;
+            }
+
+            var endpoint = ea_settings.rest_url + 'easy-appointments/v1/gdpr?_wpnonce=' + wpApiSettings.nonce;
+            jQuery.ajax({
+                url: endpoint,
+                type: 'DELETE',
+                success: function(result) {
+                    alert(result);
+                }
+            });
         }
     });    // Main tamplate
     EA.ToolsView = Backbone.View.extend({

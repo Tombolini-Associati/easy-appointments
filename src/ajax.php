@@ -446,10 +446,17 @@ class EAAjax
             $this->send_ok_json_result($response);
         }
 
+        $keys = array_map(function($options) {
+           return $options['ea_key'];
+        });
+
         $this->models->clear_options();
 
         // case of update
         if (array_key_exists('options', $data)) {
+
+            do_action('ea_update_options', $data['options']);
+
             foreach ($data['options'] as $option) {
                 // update single option
                 $response['options'][] = $this->models->replace('ea_options', $option);
@@ -1124,7 +1131,7 @@ class EAAjax
         $site_key = $this->options->get_option_value('captcha.site-key');
         $secret   = $this->options->get_option_value('captcha.secret-key');
 
-        $captcha = $_REQUEST['captcha'];
+        $captcha = array_key_exists('captcha', $_REQUEST) ? $_REQUEST['captcha'] : '';
 
         if (empty($secret) || empty($site_key)) {
             return;

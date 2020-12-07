@@ -5,7 +5,7 @@ Tags: appointment, appointments, Booking, calendar, plugin, reservation, reserva
 Requires at least: 3.7
 Tested up to: 5.5
 Requires PHP: 5.3
-Stable tag: 3.0.3
+Stable tag: 3.1.3
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -214,6 +214,62 @@ Note: you can have only one calendar on one page.
 25. Admin panel - Report - Export page
 
 == Changelog ==
+
+* 3.1.3 (2020-12-07) =
+* Fixed issues with masked field when you are not logged in.
+
+= 3.1.2 (2020-12-04) =
+* Added new field type - Masked input field. Now you can create your own format of input field. Useful for area code, phone numbers etc.
+
+= 3.1.1 (2020-11-29) =
+* Fixed issue with missing image resources on vacation screen
+
+= 3.1.0 (2020-11-29) =
+* Added Vacation settings in Admin panel. Now you can select vacation days for employees that will be block on `ea_bootstrap` shortcode.
+
+= 3.0.15 (2020-11-22) =
+* Added option for fullcalendar shortcode to select current logged employee `worker="logged"`
+* Improved Service/Location/Worker accessibility via tab key
+* Improved styles
+
+= 3.0.14 (2020-11-03) =
+* Fixed issue with `captcha` warning message
+
+= 3.0.13 (2020-10-30) =
+* Fixed issue with Worker and Location mixed in form
+
+= 3.0.12 (2020-10-29) =
+* Fixed Security issues with endpoints
+
+= 3.0.11 (2020-10-23) =
+* Fixed issue with PHP NOTICE message on Appointment creation
+* Improvements regarding invalid date on Appointments overview
+
+= 3.0.10 (2020-10-21) =
+* Admin appointments page now can be navigate via Tab key (edit, clone, delete appointment)
+
+= 3.0.9 (2020-10-20) =
+* Fixed issue with label above field that was not working in [ea_bootstrap]
+* Fixed issue with German translation and span element
+
+= 3.0.8 (2020-10-16) =
+* Fixed small issues JS errors on customers form
+* Custom styles are now applied to FullCalendar shortcode as well
+
+= 3.0.7 (2020-10-06) =
+* Added GDPR options that auto remove customers data older then 6 months
+* Settings improvement
+* Block empty start time save for Appointments in Admin Panel
+
+= 3.0.6 (2020-09-27) =
+* Small Style improvements
+
+= 3.0.5 (2020-09-21) =
+* Added option for custom default label for Select field in [ea_bootstrap] shortcode called `select_placeholder`. Default value is '-'
+
+= 3.0.4 (2020-08-23) =
+* Added option for labels above fields for [ea_bootstrap] shortcode
+* Added action to delete customers data older then 6 months (gdpr section)
 
 = 3.0.3 (2020-08-08) =
 * Added clear log button on EA Settings > Tools page

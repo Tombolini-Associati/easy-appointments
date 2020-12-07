@@ -98,6 +98,14 @@ class EAFrontend
             true
         );
 
+        wp_register_script(
+            'ea-masked',
+            EA_PLUGIN_URL . 'js/libs/jquery.inputmask.min.js',
+            array('jquery'),
+            EASY_APPOINTMENTS_VERSION,
+            true
+        );
+
         // frontend standard script
         wp_register_script(
             'ea-front-end',
@@ -235,7 +243,11 @@ class EAFrontend
         $customCss = strip_tags($customCss);
         $customCss = str_replace(array('<?php', '?>', "\t"), array('', '', ''), $customCss);
 
-        wp_localize_script('ea-front-end', 'ea_settings', $settings);
+        wp_localize_script(
+            'ea-front-end',
+            'ea_settings',
+            EATableColumns::clear_settings_data_frontend($settings)
+        );
 
         wp_enqueue_script('underscore');
         wp_enqueue_script('ea-validator');
@@ -253,6 +265,20 @@ class EAFrontend
         }
 
         $meta = $this->models->get_all_rows("ea_meta_fields", array(), array('position' => 'ASC'));
+
+        $add_maks_js = false;
+        foreach ($meta as $row) {
+            // we need to add masked js
+            if ($row->type === 'MASKED') {
+                $add_maks_js = true;
+            }
+        }
+
+        if ($add_maks_js) {
+            wp_add_inline_script('ea-masked', "jQuery('.masked-field').inputmask()");
+            wp_enqueue_script('ea-masked');
+        }
+
         $custom_form = $this->generate_custom_fields($meta);
 
         // add custom CSS
@@ -379,6 +405,8 @@ class EAFrontend
                 $email = ($item->validation == 'email') ? 'data-msg-email="' . __('Please enter a valid email address', 'easy-appointments') . '" data-rule-email="true"' : '';
 
                 $html .= '<input class="custom-field" type="text" name="' . $item->slug . '" ' . $msg . ' ' . $email . ' />';
+            } else if ($item->type == 'MASKED') {
+                $html .= '<input class="custom-field masked-field" type="text" name="' . $item->slug . '" data-inputmask="\'mask\':\'' . $item->default_value . '\'" />';
             } else if ($item->type == 'EMAIL') {
                 $msg = ($r) ? 'data-rule-required="true" data-msg-required="' . __('This field is required.', 'easy-appointments') . '"' : '';
                 $email = 'data-msg-email="' . __('Please enter a valid email address', 'easy-appointments') . '" data-rule-email="true"';
@@ -438,7 +466,8 @@ class EAFrontend
             'show_week'            => '0',
             'cal_auto_select'      => '1',
             'block_days'           => null,
-            'block_days_tooltip'   => ''
+            'block_days_tooltip'   => '',
+            'select_placeholder'   => '-'
         ), $atts);
 
         // check params
@@ -470,7 +499,6 @@ class EAFrontend
         $settings['cal_auto_select']       = $code_params['cal_auto_select'];
         $settings['block_days']            = $code_params['block_days'] !== null ? explode(',', $code_params['block_days']) : null;
         $settings['block_days_tooltip']    = $code_params['block_days_tooltip'];
-
 
             // LOCALIZATION
         $settings['trans.please-select-new-date'] = __('Please select another day', 'easy-appointments');
@@ -510,15 +538,35 @@ class EAFrontend
 
         unset($settings['custom.css']);
 
+        if ($settings['form.label.above'] === '1') {
+            $settings['form_class'] = 'ea-form-v2';
+        }
+
         $rows = $this->models->get_all_rows("ea_meta_fields", array(), array('position' => 'ASC'));
+        $add_maks_js = false;
 
         foreach ($rows as $key => $row) {
             $rows[$key]->label = __($row->label, 'easy-appointments');
+
+            // we need to add masked js
+            if ($row->type === 'MASKED') {
+                $add_maks_js = true;
+            }
         }
         $rows = apply_filters( 'ea_form_rows', $rows);
         $settings['MetaFields'] = $rows;
 
-        wp_localize_script('ea-front-bootstrap', 'ea_settings', $settings);
+        wp_localize_script(
+            'ea-front-bootstrap',
+            'ea_settings',
+            EATableColumns::clear_settings_data_frontend($settings)
+        );
+
+        wp_localize_script(
+            'ea-front-bootstrap',
+            'ea_vacations',
+            json_decode($this->options->get_option_value('vacations', '[]'))
+        );
 
         wp_enqueue_script('underscore');
         wp_enqueue_script('ea-validator');
@@ -526,6 +574,11 @@ class EAFrontend
         // wp_enqueue_script( 'ea-datepicker-localization' );
         // wp_enqueue_script( 'ea-bootstrap-select' );
         wp_enqueue_script('ea-front-bootstrap');
+
+        if ($add_maks_js) {
+            wp_add_inline_script('ea-masked', "jQuery('.masked-field').inputmask();");
+            wp_enqueue_script('ea-masked');
+        }
 
         if (empty($settings['css.off'])) {
             wp_enqueue_style('ea-bootstrap');
@@ -579,7 +632,7 @@ class EAFrontend
      * @param null $service_id
      * @param null $worker_id
      */
-    private function get_options($type, $location_id = null, $service_id = null, $worker_id = null)
+    private function get_options($type, $location_id = null, $service_id = null, $worker_id = null, $placeholder = '-')
     {
         if (!$this->generate_next_option) {
             return;
@@ -636,7 +689,9 @@ class EAFrontend
             }
         }
 
-        echo "<option value='' selected='selected'>-</option>";
+        // option
+        $default_value = esc_html($placeholder);
+        echo "<option value='' selected='selected'>{$default_value}</option>";
 
         foreach ($rows as $row) {
             $price = !empty($row->price) ? " data-price='{$row->price}'" : '';

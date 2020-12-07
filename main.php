@@ -4,13 +4,14 @@
  * Plugin Name: Easy Appointments
  * Plugin URI: https://easy-appointments.net/
  * Description: Simple and easy to use management system for Appointments and Bookings
- * Version: 3.0.3
+ * Version: 3.1.3
  * Requires PHP: 5.3
  * Author: Nikola Loncar
  * Author URI: http://nikolaloncar.com
  * Text Domain: easy-appointments
  * Domain Path: /languages
  */
+
 
 // If this file is called directly, abort.
 if (!defined('WPINC')) {
@@ -20,7 +21,7 @@ if (!defined('WPINC')) {
 /**
  * Currently plugin version.
  */
-define( 'EASY_APPOINTMENTS_VERSION', '3.0.3' );
+define( 'EASY_APPOINTMENTS_VERSION', '3.1.3' );
 
 // path for source files
 define('EA_SRC_DIR', dirname(__FILE__) . '/src/');
@@ -92,6 +93,7 @@ class EasyAppointment
 
         // cron
         add_action('easyapp_hourly_event', array($this, 'delete_reservations'));
+        add_action('ea_gdpr_auto_delete', array($this, 'delete_old_data'));
 
         // we want to check if it is link from EA mail
         add_action('init', array($this, 'url_delete_reservations'));
@@ -230,6 +232,7 @@ class EasyAppointment
 
         $uninstall->drop_db();
         $uninstall->delete_db_version();
+        $uninstall->clear_cron();
     }
 
     /**
@@ -295,6 +298,12 @@ class EasyAppointment
         /** @var EADBModels $models */
         $models = $this->container['db_models'];
         $models->delete_reservations();
+    }
+
+    public function delete_old_data()
+    {
+        $gdpr = new EAGDPRActions($this->container['db_models']);
+        $gdpr->clear_old_custome_data();
     }
 }
 

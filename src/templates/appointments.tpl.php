@@ -94,7 +94,7 @@
 				<tr>
                     <th colspan="2" class="manage-column column-title"><a class="ea-set-sort" data-key="id" href="#">Id</a> / <?php _e('Location', 'easy-appointments');?> / <?php _e('Service', 'easy-appointments');?> / <?php _e('Worker', 'easy-appointments');?></th>
 					<th colspan="2" class="manage-column column-title"><?php _e('Customer', 'easy-appointments');?></th>
-					<th class="manage-column column-title"><?php _e('Descrtiption', 'easy-appointments');?></th>
+					<th class="manage-column column-title"><?php _e('Description', 'easy-appointments');?></th>
 					<th class="manage-column column-title"><a class="ea-set-sort" data-key="date" href="#"><?php _e('Date & time', 'easy-appointments');?></a></th>
                     <th class="manage-column column-title"><?php _e('Status', 'easy-appointments');?> / <?php _e('Price', 'easy-appointments');?> / <a href="#" class="ea-set-sort" data-key="created"><?php _e('Created', 'easy-appointments');?></a></th>
 					<th class="manage-column column-title"><?php _e('Action', 'easy-appointments');?></th>
@@ -183,7 +183,7 @@
 				</td>
 				<td colspan="2">
 					<% _.each(cache.MetaFields,function(item,key,list) { %>
-						<% if(item.type === 'INPUT') { %>
+						<% if(item.type === 'INPUT' || item.type === 'MASKED') { %>
 						<input type="text" data-prop="<%= item.slug %>" placeholder="<%= _.escape( item.label ) %>" value="<% if (typeof row[item.slug] !== "undefined") { %><%= _.escape( row[item.slug] ) %><% } %>"><br>
                         <% } else if(item.type === 'PHONE') { %>
                         <input type="text" data-prop="<%= item.slug %>" placeholder="<%= _.escape( item.label ) %>" value="<% if (typeof row[item.slug] !== "undefined") { %><%= _.escape( row[item.slug] ) %><% } %>"><br>
