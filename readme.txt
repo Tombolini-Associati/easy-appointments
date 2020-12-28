@@ -5,7 +5,7 @@ Tags: appointment, appointments, Booking, calendar, plugin, reservation, reserva
 Requires at least: 3.7
 Tested up to: 5.5
 Requires PHP: 5.3
-Stable tag: 3.1.3
+Stable tag: 3.2.1
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -215,7 +215,18 @@ Note: you can have only one calendar on one page.
 
 == Changelog ==
 
-* 3.1.3 (2020-12-07) =
+= 3.2.1 (2020-12-28) =
+* Compatibility with older WP versions (before 5)
+
+= 3.2.0 (2020-12-27) =
+* Admin - new settings pages for Locations, Workers and Services
+* Updated translations
+* Fixed issue with error warning on cron execution
+
+= 3.1.4 (2020-12-08) =
+* Translation files updated
+
+= 3.1.3 (2020-12-07) =
 * Fixed issues with masked field when you are not logged in.
 
 = 3.1.2 (2020-12-04) =
